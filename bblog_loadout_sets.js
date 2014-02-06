@@ -11,8 +11,8 @@
  * And an added thanks to Amkhatar for the design ideas.
  *
  * @author   Joshua M. Murphy (poisonblx)
- * @version  0.0.0.5
- * @date     2013-11-14
+ * @version  0.6
+ * @date     2014-01-05
  * @url      http://poisonbl.freeshell.org/bf4/bblog_loadout_sets.js
  *
  * Uses:
@@ -150,8 +150,12 @@ BBLog.handle("add.plugin", {
       instance.storage('loadout.set4.name', instance.t("set.basename") + " 4");
     }
 
+    if (instance.storage('loadout.set1.data')) { instance.storage('loadout.set1.data', null); };
+    if (instance.storage('loadout.set2.data')) { instance.storage('loadout.set2.data', null); };
+    if (instance.storage('loadout.set3.data')) { instance.storage('loadout.set3.data', null); };
+    if (instance.storage('loadout.set4.data')) { instance.storage('loadout.set4.data', null); };
+
     if (BBLog.cache('mode') === 'bf4') {
-      instance.cache('show_locked_items', true);
       this.handler(instance);
     }
   },
@@ -224,22 +228,23 @@ BBLog.handle("add.plugin", {
       });
 
       $('.loadout-sets-ugm-load').click(function () {
-        current_setname = this.className.split(/\s+/)[0];
-        new_loadout = instance.storage('loadout.' + current_setname + '.data');
-        if (new_loadout) {
-          var new_loadout = JSON.parse(new_loadout);
-          var loadoutmodel = window.BL.backbone.get({
-              model : {
-                name : 'loadout_model'
-              }
-            });
+        var current_setname = this.className.split(/\s+/)[0];
+        var new_loadout_weapons = instance.storage('loadout.' + current_setname + '.weapons');
+        var new_loadout_kits = instance.storage('loadout.' + current_setname + '.kits');
+        if ( new_loadout_weapons && new_loadout_kits ) {
+          new_loadout_weapons = JSON.parse(new_loadout_weapons);
+          new_loadout_kits = JSON.parse(new_loadout_kits);
+          var loadoutmodel = window.BL.backbone.model_instances.loadoutModel;
+          var new_loadout = loadoutmodel.get('loadout');
+          new_loadout.weapons = new_loadout_weapons;
+          new_loadout.kits = new_loadout_kits;
           loadoutmodel.set({
             loadout : new_loadout
           }).set({
             changed : true
           });
-          loadoutmodel.trigger('change:loadout').trigger('refresh');
-          loadoutmodel.save_loadout();
+          loadoutmodel.trigger('refresh');
+          loadoutmodel.saveLoadout();
           $('#loadout-sets-ugm-menu').slideUp("slow");
         }
       });
@@ -247,8 +252,6 @@ BBLog.handle("add.plugin", {
 
     // Loadout page buttons/menus/etc
     if ($('#loadout-actions').length) {
-      var show_locked = instance.cache('show_locked_items');
-      $('.items-select-item.locked').toggle(show_locked);
       if (!$('.loadout-edit-sets').length) {
 
         instance.cssAddRule('#loadout-sets', {
@@ -328,9 +331,9 @@ BBLog.handle("add.plugin", {
         });
 
         $('#loadout-sets .loadout-rename').click(function () {
-          current_setname = this.className.split(/\s+/)[0];
-          oldname = instance.storage('loadout.' + current_setname + '.name');
-          newname = prompt(instance.t("prompt.setname"), oldname);
+          var current_setname = this.className.split(/\s+/)[0];
+          var oldname = instance.storage('loadout.' + current_setname + '.name');
+          var newname = prompt(instance.t("prompt.setname"), oldname);
           instance.storage('loadout.' + current_setname + '.name', newname ? newname : oldname);
           $("#loadout-sets ." + current_setname + ".loadout-load").text(instance.storage('loadout.' + current_setname + '.name'));
           $("#loadout-sets-ugm-menu ." + current_setname + ".loadout-sets-ugm-load").text(instance.storage('loadout.' + current_setname + '.name'));
@@ -340,46 +343,45 @@ BBLog.handle("add.plugin", {
           var current_setname = this.className.split(/\s+/)[0];
           var loadoutmodel = window.BL.backbone.get({
               model : {
-                name : 'loadout_model'
+                name : 'loadoutModel'
               }
             });
-          var current_loadout = JSON.stringify(loadoutmodel.get('loadout'));
-          instance.storage('loadout.' + current_setname + '.data', current_loadout);
+          var current_loadout_weapons = JSON.stringify(loadoutmodel.get('loadout').weapons);
+          var current_loadout_kits = JSON.stringify(loadoutmodel.get('loadout').kits);
+          instance.storage('loadout.' + current_setname + '.weapons', current_loadout_weapons);
+          instance.storage('loadout.' + current_setname + '.kits', current_loadout_kits);
         });
 
         $('#loadout-sets .loadout-load').click(function () {
-          current_setname = this.className.split(/\s+/)[0];
-          var new_loadout = instance.storage('loadout.' + current_setname + '.data');
-          if (new_loadout) {
-            new_loadout = JSON.parse(new_loadout);
-            var loadoutmodel = window.BL.backbone.get({
-                model : {
-                  name : 'loadout_model'
-                }
-              });
+          var current_setname = this.className.split(/\s+/)[0];
+          var new_loadout_weapons = instance.storage('loadout.' + current_setname + '.weapons');
+          var new_loadout_kits = instance.storage('loadout.' + current_setname + '.kits');
+          if ( new_loadout_weapons && new_loadout_kits ) {
+            new_loadout_weapons = JSON.parse(new_loadout_weapons);
+            new_loadout_kits = JSON.parse(new_loadout_kits);
+            var loadoutmodel = window.BL.backbone.model_instances.loadoutModel;
+            var new_loadout = loadoutmodel.get('loadout');
+            new_loadout.weapons = new_loadout_weapons;
+            new_loadout.kits = new_loadout_kits;
             loadoutmodel.set({
               loadout : new_loadout
             }).set({
               changed : true
             });
-            loadoutmodel.trigger('change:loadout').trigger('refresh');
+            loadoutmodel.trigger('refresh');
           }
         });
 
         $('#loadout-sets .loadout-clear').click(function () {
-          current_setname = this.className.split(/\s+/)[0];
-          instance.storage('loadout.' + current_setname + '.data', 0);
+          var current_setname = this.className.split(/\s+/)[0];
+          instance.storage('loadout.' + current_setname + '.weapons', null);
+          instance.storage('loadout.' + current_setname + '.kits', null);
         });
 
         if (instance.storage("option.randombutton")) {
           $('#loadout-actions').prepend(' <div id="loadout-random" class="btn btn-small loadout-random">' + instance.t("button.random") + '</div> ');
           $('#loadout-actions .loadout-random').click(function () {
-            var loadoutmodel = window.BL.backbone.get({
-                model : {
-                  name : 'loadout_model'
-                }
-              });
-            loadoutmodel.randomize();
+            window.BL.backbone.model_instances.loadoutModel.randomize();
           });
         }
       }
