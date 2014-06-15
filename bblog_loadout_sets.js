@@ -4,7 +4,7 @@
  *
  * Translators:
  *  - de: Brady_The
- *  - fr: Amkhatar
+ *  - fr: Amkhatar, GeneralSheppard
  *  - ru: ThePredatoR
  *  - cs: dapil
  *
@@ -59,19 +59,19 @@ BBLog.handle("add.plugin", {
       "button.descriptions" : "Описания"
     },
     "fr" : {
-      "plugin.name" : "Jeux d'équipement",
-      "button.sets" : "Jeux",
-      "button.save" : "Stocker",
+      "plugin.name" : "Sets d'équipements",
+      "button.sets" : "Equipements",
+      "button.save" : "Sauvegarder",
       "button.load" : "Utiliser",
-      "button.clear" : "Vider",
-      "prompt.setname" : "Nom du jeu d'équipement ",
+      "button.clear" : "Réinitialiser",
+      "prompt.setname" : "Nom de l'équipement: ",
       "set.basename" : "Équipement",
       "button.rename" : "Renommer",
       "button.random" : "Aléatoire",
-      "button.togglelocked" : "Améliorations/Débloquées",
-      "option.togglelocked" : "Affiche le bouton Améliorations/Débloquées",
-      "option.randombutton" : "Afficher le bouton Aléatoire",
-      "button.descriptions" : "Descriptions"
+      "button.togglelocked" : "Masquer (Vérouillé)",
+      "option.togglelocked" : "Afficher le bouton Masquer Vérouillé", //Not sure
+      "option.randombutton" : "Afficher le bouton Choisir Aléatoire",
+      "button.descriptions" : "Descriptions" //Détails
     },
     "cs" : {
       "plugin.name" : "Sady vybavení",
